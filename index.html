@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>交通巡检监控平台</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="weather" id="weather">小雨 3~19℃</span>
+      </div>
+      <div class="header-center">
+        <div class="title-deco left-deco"></div>
+        <h1 class="main-title">交通巡检监控平台</h1>
+        <div class="title-deco right-deco"></div>
+      </div>
+      <div class="header-right">
+        <span class="clock" id="clock">05:48:31</span>
+      </div>
+    </header>
+
+    <!-- Main Content: 3-column -->
+    <main class="content">
+      <!-- LEFT COLUMN -->
+      <section class="col col-left">
+        <!-- 当前地点 -->
+        <div class="panel">
+          <div class="panel-title"><span class="title-icon"></span>当前地点</div>
+          <div class="panel-body">
+            <div class="loc-name">沙河口区</div>
+            <div class="loc-detail">中国辽宁省大连市</div>
+            <div class="loc-stats">
+              <div class="loc-stat">
+                <div class="loc-stat-val">352</div>
+                <div class="loc-stat-label">管辖路街<span class="unit">条</span></div>
+              </div>
+              <div class="loc-stat">
+                <div class="loc-stat-val">6</div>
+                <div class="loc-stat-label">景区数量<span class="unit">个</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 交通拥堵指数 -->
+        <div class="panel flex-1">
+          <div class="panel-title"><span class="title-icon"></span>交通拥堵指数</div>
+          <div class="panel-body">
+            <div class="index-ring" id="indexRing"></div>
+            <div class="metrics">
+              <div class="metric">
+                <div class="metric-val">50.7</div>
+                <div class="metric-label">快速路平均车速（km/h）</div>
+              </div>
+              <div class="metric">
+                <div class="metric-val">30.6</div>
+                <div class="metric-label">主干道平均车速（km/h）</div>
+              </div>
+              <div class="metric">
+                <div class="metric-val">3.5</div>
+                <div class="metric-label">拥堵里程比例（%）</div>
+              </div>
+            </div>
+            <div class="legend-bar">
+              <span class="legend-item smooth"><i></i>畅通</span>
+              <span class="legend-item light"><i></i>轻度拥堵</span>
+              <span class="legend-item heavy"><i></i>严重拥堵</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 区域分布 -->
+        <div class="panel flex-1">
+          <div class="panel-title"><span class="title-icon"></span>区域分布</div>
+          <div class="panel-body">
+            <div id="districtChart" class="chart-sm"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER COLUMN -->
+      <section class="col col-center">
+        <div class="panel map-panel">
+          <div class="panel-body map-body">
+            <div id="mapChart" class="chart-map"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <section class="col col-right">
+        <!-- 巡检告警 -->
+        <div class="panel">
+          <div class="panel-title"><span class="title-icon"></span>巡检告警<span class="title-btn" onclick="window.location.href='work-order.html'">巡检工单</span></div>
+          <div class="panel-body">
+            <div class="alert-row">
+              <div class="alert-total">
+                <span class="alert-num">200</span>
+                <span class="alert-label">总计</span>
+              </div>
+              <div id="alertChart" class="chart-xs"></div>
+            </div>
+            <div class="alert-tags">
+              <div class="alert-tag"><span class="tag-dot red"></span>未处理<span class="tag-num">18</span></div>
+              <div class="alert-tag"><span class="tag-dot green"></span>已处理<span class="tag-num">182</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 主干道交通指标 -->
+        <div class="panel">
+          <div class="panel-title"><span class="title-icon"></span>主干道交通指标</div>
+          <div class="panel-body">
+            <div class="road-top-row">
+              <div class="road-index-main">
+                <div class="road-index-val">6.15</div>
+                <div class="road-index-label">拥堵指数</div>
+              </div>
+              <div class="road-metrics">
+                <div class="road-metric">
+                  <span class="rm-val">43.8</span>
+                  <span class="rm-unit">km/h</span>
+                  <span class="rm-label">平均车速</span>
+                </div>
+                <div class="road-metric">
+                  <span class="rm-val">318.0</span>
+                  <span class="rm-unit">km</span>
+                  <span class="rm-label">路网总里程</span>
+                </div>
+              </div>
+            </div>
+            <div class="road-search">
+              <input type="text" placeholder="请输入道路名称…" class="search-input">
+              <button class="search-btn">确认</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 拥堵原因分析 -->
+        <div class="panel flex-1">
+          <div class="panel-title"><span class="title-icon"></span>拥堵原因分析</div>
+          <div class="panel-body">
+            <div id="congestionChart" class="chart-sm"></div>
+          </div>
+        </div>
+
+        <!-- 主要道路行程车速 -->
+        <div class="panel flex-1">
+          <div class="panel-title"><span class="title-icon"></span>主要道路行程车速</div>
+          <div class="panel-body no-pad">
+            <table class="road-table">
+              <thead>
+                <tr><th>序号</th><th>道路</th><th>当前车速</th><th>通行时间</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>疏港路</td><td>30.7</td><td>29min</td></tr>
+                <tr><td>2</td><td>东联路</td><td>32.8</td><td>11min</td></tr>
+                <tr><td>3</td><td>西北路</td><td>38.5</td><td>20min</td></tr>
+                <tr><td>4</td><td>东北快速路</td><td>50.1</td><td>9min</td></tr>
+                <tr><td>5</td><td>白云路</td><td>46.3</td><td>19min</td></tr>
+                <tr><td>6</td><td>东联路</td><td>32.7</td><td>11min</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 巡检工单 -->
+        <div class="panel panel-sm">
+          <div class="panel-body">
+            <div class="work-orders">
+              <div class="wo-item"><span class="wo-label">问题数量</span><span class="wo-val">0</span></div>
+              <div class="wo-item"><span class="wo-label">未处理</span><span class="wo-val warn">0</span></div>
+              <div class="wo-item"><span class="wo-label">已处理</span><span class="wo-val ok">0</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">· 城市路况监测大屏 ·</footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

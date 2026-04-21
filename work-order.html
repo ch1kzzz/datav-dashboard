@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>巡检工单 - 交通巡检监控平台</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="work-order.css">
+</head>
+<body>
+  <div class="wo-page">
+    <!-- Top Nav -->
+    <nav class="wo-nav">
+      <a href="index.html" class="nav-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        返回首页
+      </a>
+      <span class="nav-title">未处理巡检告警工单</span>
+      <button class="nav-add-btn" id="addBtn">+ 新增工单</button>
+    </nav>
+
+    <!-- Main Table Area -->
+    <main class="wo-main">
+      <div class="table-wrap">
+        <table class="wo-table" id="woTable">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>设备名称</th>
+              <th>所在区块</th>
+              <th>告警类型</th>
+              <th>告警坐标</th>
+              <th>上报人</th>
+              <th>上报时间</th>
+              <th>问题等级</th>
+              <th>问题描述</th>
+            </tr>
+          </thead>
+          <tbody id="woBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="wo-pagination" id="pagination"></div>
+    </main>
+  </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <span>新增巡检告警工单</span>
+          <span class="modal-close" id="modalClose">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="woForm" class="wo-form">
+            <div class="form-row">
+              <label>设备名称</label>
+              <input type="text" name="device" maxlength="200" placeholder="请输入设备名称" required>
+            </div>
+            <div class="form-row">
+              <label>所在区块</label>
+              <input type="text" name="location" maxlength="200" placeholder="请输入所在区块" required>
+            </div>
+            <div class="form-row">
+              <label>告警类型</label>
+              <input type="text" name="type" maxlength="200" placeholder="请输入告警类型" required>
+            </div>
+            <div class="form-row">
+              <label>告警坐标</label>
+              <input type="text" name="coord" maxlength="200" placeholder="例：113.5628°E, 23.1245°N" required>
+            </div>
+            <div class="form-row">
+              <label>上报人</label>
+              <input type="text" name="reporter" maxlength="200" placeholder="请输入上报人" required>
+            </div>
+            <div class="form-row">
+              <label>上报时间</label>
+              <div class="time-group">
+                <input type="date" name="date" required>
+                <input type="time" name="time" step="1" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>问题等级</label>
+              <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="severity" value="一级" checked><span class="radio-dot"></span>一级</label>
+                <label class="radio-label"><input type="radio" name="severity" value="二级"><span class="radio-dot"></span>二级</label>
+                <label class="radio-label"><input type="radio" name="severity" value="三级"><span class="radio-dot"></span>三级</label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>问题描述</label>
+              <textarea name="desc" maxlength="200" placeholder="请输入问题描述（最多200字）" rows="3" required></textarea>
+            </div>
+            <div class="form-row">
+              <label>问题图片</label>
+              <div class="upload-area" id="uploadArea">
+                <input type="file" name="images" id="fileInput" accept="image/*" multiple hidden>
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>点击上传图片</span>
+                </div>
+                <div class="upload-preview" id="uploadPreview"></div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="btnCancel">取消</button>
+              <button type="submit" class="btn-submit">提交</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="work-order.js"></script>
+</body>
+</html>
