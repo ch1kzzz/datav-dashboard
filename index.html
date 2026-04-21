@@ -8,6 +8,23 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
+  <!-- Login Gate -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="login-logo">交通巡检监控平台</div>
+      <div class="login-field">
+        <label>账号</label>
+        <input type="text" id="loginUser" placeholder="请输入账号" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label>密码</label>
+        <input type="password" id="loginPass" placeholder="请输入密码">
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="login-btn" id="loginBtn">登 录</button>
+    </div>
+  </div>
+
   <div class="dashboard">
     <!-- Header -->
     <header class="header">
@@ -186,6 +203,7 @@
     <footer class="footer">· 城市路况监测大屏 ·</footer>
   </div>
 
+  <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
