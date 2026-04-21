@@ -101,126 +101,161 @@ function initDistrictChart() {
   window.addEventListener('resize', () => chart.resize());
 }
 
-/* === 3. China/Liaoning Map (中间地图) === */
+/* === 3. Route Network Diagram (inline, no external deps) === */
 function initMap() {
   const el = document.getElementById('mapChart');
   if (!el) return;
   const chart = echarts.init(el);
 
-  // Dalian city coordinates and key points
-  const dalianCenter = [121.62, 38.92];
-  const scatterData = [
-    { name: '沙河口区', value: [121.58, 38.90, 85] },
-    { name: '西岗区', value: [121.61, 38.91, 72] },
-    { name: '中山区', value: [121.64, 38.92, 65] },
-    { name: '甘井子区', value: [121.53, 38.95, 90] },
-    { name: '旅顺口区', value: [121.26, 38.81, 45] },
-    { name: '金州区', value: [121.72, 39.10, 55] },
-    { name: '普兰店区', value: [121.97, 39.40, 40] },
-    { name: '瓦房店市', value: [121.98, 39.63, 35] },
-    { name: '庄河市', value: [122.97, 39.68, 30] }
+  // Inline GeoJSON — stylized district regions as background
+  const routeGeoJson = {
+    type: 'FeatureCollection',
+    features: [
+      { type: 'Feature', properties: { name: '沙河口区' }, geometry: { type: 'Polygon', coordinates: [[[121.52,38.87],[121.56,38.86],[121.59,38.88],[121.60,38.91],[121.57,38.93],[121.53,38.92],[121.52,38.87]]] } },
+      { type: 'Feature', properties: { name: '西岗区' }, geometry: { type: 'Polygon', coordinates: [[[121.57,38.89],[121.61,38.88],[121.63,38.91],[121.60,38.93],[121.57,38.93],[121.57,38.89]]] } },
+      { type: 'Feature', properties: { name: '中山区' }, geometry: { type: 'Polygon', coordinates: [[[121.60,38.88],[121.65,38.87],[121.67,38.90],[121.65,38.93],[121.62,38.93],[121.60,38.91],[121.60,38.88]]] } },
+      { type: 'Feature', properties: { name: '甘井子区' }, geometry: { type: 'Polygon', coordinates: [[[121.47,38.92],[121.53,38.90],[121.58,38.94],[121.60,38.97],[121.55,39.00],[121.48,38.98],[121.47,38.92]]] } },
+      { type: 'Feature', properties: { name: '旅顺口区' }, geometry: { type: 'Polygon', coordinates: [[[121.18,38.78],[121.28,38.76],[121.35,38.80],[121.30,38.85],[121.20,38.84],[121.18,38.78]]] } },
+      { type: 'Feature', properties: { name: '金州区' }, geometry: { type: 'Polygon', coordinates: [[[121.62,38.96],[121.70,38.94],[121.78,39.00],[121.75,39.08],[121.66,39.10],[121.60,39.04],[121.62,38.96]]] } },
+      { type: 'Feature', properties: { name: '普兰店区' }, geometry: { type: 'Polygon', coordinates: [[[121.80,39.30],[121.95,39.25],[122.05,39.35],[122.00,39.45],[121.85,39.42],[121.80,39.30]]] } }
+    ]
+  };
+
+  echarts.registerMap('routeArea', routeGeoJson);
+
+  const center = [121.58, 38.92];
+
+  const nodes = [
+    { name: '指挥中心', coord: [121.58, 38.90], size: 22, color: '#00E4FF', glow: true },
+    { name: '东北快速路 K206', coord: [121.64, 38.97], size: 14, color: '#00FF88' },
+    { name: '疏港路 K52', coord: [121.54, 38.91], size: 14, color: '#FF9F18' },
+    { name: '东联路 K128', coord: [121.65, 38.93], size: 14, color: '#00FF88' },
+    { name: '西北路 K38', coord: [121.49, 38.93], size: 14, color: '#FF9F18' },
+    { name: '白云路 K66', coord: [121.59, 38.86], size: 12, color: '#A855F7' },
+    { name: '广深沿江 S20', coord: [121.50, 38.96], size: 12, color: '#2C92FF' },
+    { name: '旅顺枢纽', coord: [121.26, 38.81], size: 16, color: '#2C92FF' },
+    { name: '金州枢纽', coord: [121.70, 39.02], size: 16, color: '#2C92FF' },
+    { name: '普兰店站', coord: [121.92, 39.36], size: 14, color: '#2C92FF' }
   ];
 
-  const flyLineData = [
-    [{ coord: [121.58, 38.90] }, { coord: [121.64, 38.92] }],
-    [{ coord: [121.58, 38.90] }, { coord: [121.53, 38.95] }],
-    [{ coord: [121.58, 38.90] }, { coord: [121.26, 38.81] }],
-    [{ coord: [121.58, 38.90] }, { coord: [121.72, 39.10] }],
-    [{ coord: [121.58, 38.90] }, { coord: [121.97, 39.40] }]
+  const routes = [
+    { name: '巡检路线A — 北线', coords: [[121.58,38.90],[121.60,38.93],[121.64,38.97],[121.70,39.02]], color: '#00E4FF' },
+    { name: '巡检路线B — 西线', coords: [[121.58,38.90],[121.54,38.91],[121.49,38.93],[121.42,38.88],[121.26,38.81]], color: '#2C92FF' },
+    { name: '巡检路线C — 南线', coords: [[121.58,38.90],[121.59,38.86],[121.55,38.83],[121.50,38.96]], color: '#A855F7' },
+    { name: '巡检路线D — 东线', coords: [[121.58,38.90],[121.65,38.93],[121.70,38.96],[121.78,39.05],[121.92,39.36]], color: '#FF9F18' },
+    { name: '巡检路线E — 环城', coords: [[121.54,38.91],[121.58,38.90],[121.65,38.93],[121.64,38.97],[121.60,38.97],[121.54,38.91]], color: '#00FF88' }
   ];
 
-  // Try to load Dalian GeoJSON, fallback to scatter map
-  fetch('https://geo.datav.aliyun.com/areas_v3/bound/210200_full.json')
-    .then(r => r.json())
-    .then(geoJson => {
-      echarts.registerMap('dalian', geoJson);
-      chart.setOption(getMapOption(scatterData, flyLineData, true));
-    })
-    .catch(() => {
-      chart.setOption(getMapOption(scatterData, flyLineData, false));
-    });
-
-  function getMapOption(scatter, lines, hasMap) {
-    const base = {
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'item',
-        formatter: p => `${p.name}<br/>拥堵指数: ${p.value?.[2] ?? '-'}`
+  chart.setOption({
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(6, 30, 93, 0.92)',
+      borderColor: '#2C92FF',
+      borderWidth: 1,
+      textStyle: { color: '#fff', fontSize: 12 },
+      formatter: p => p.seriesName === '巡检路线' ? `<b>${p.name}</b>` : `<b>${p.name}</b><br/>状态: 巡检中`
+    },
+    geo: {
+      map: 'routeArea',
+      roam: true,
+      zoom: 1.2,
+      center: center,
+      scaleLimit: { min: 0.6, max: 8 },
+      label: {
+        show: true,
+        color: 'rgba(140, 160, 196, 0.4)',
+        fontSize: 10
       },
-      geo: hasMap ? {
-        map: 'dalian',
-        roam: true,
-        zoom: 1.1,
-        center: dalianCenter,
-        label: { show: false },
+      itemStyle: {
+        areaColor: 'rgba(8, 24, 68, 0.6)',
+        borderColor: 'rgba(44, 146, 255, 0.35)',
+        borderWidth: 1
+      },
+      emphasis: {
         itemStyle: {
-          areaColor: 'rgba(6, 30, 93, 0.6)',
-          borderColor: '#2C92FF',
-          borderWidth: 1
+          areaColor: 'rgba(44, 146, 255, 0.15)',
+          borderColor: '#00E4FF',
+          borderWidth: 2
         },
-        emphasis: {
-          itemStyle: {
-            areaColor: 'rgba(44, 146, 255, 0.25)',
-            borderColor: '#00E4FF',
-            borderWidth: 2
-          },
-          label: { show: true, color: '#00E4FF', fontSize: 12 }
-        }
-      } : {
-        show: false
+        label: { color: '#00E4FF', fontSize: 12 }
+      }
+    },
+    series: [
+      // Route lines with animated arrows
+      ...routes.map(r => ({
+        name: '巡检路线',
+        type: 'lines',
+        coordinateSystem: 'geo',
+        zlevel: 1,
+        polyline: true,
+        lineStyle: { color: r.color, width: 3, opacity: 0.6 },
+        effect: {
+          show: true,
+          period: 4 + Math.random() * 2,
+          trailLength: 0.4,
+          symbol: 'arrow',
+          symbolSize: 8,
+          color: r.color
+        },
+        data: [{ name: r.name, coords: r.coords }]
+      })),
+      // Signal fly lines
+      {
+        name: '信号传输',
+        type: 'lines',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        effect: {
+          show: true, period: 3, trailLength: 0.3,
+          symbol: 'circle', symbolSize: 4, color: '#00E4FF'
+        },
+        lineStyle: { color: '#1A4DB5', width: 1, opacity: 0.3, curveness: 0.2 },
+        data: [
+          [{ coord: [121.58, 38.90] }, { coord: [121.26, 38.81] }],
+          [{ coord: [121.58, 38.90] }, { coord: [121.70, 39.02] }],
+          [{ coord: [121.58, 38.90] }, { coord: [121.92, 39.36] }],
+          [{ coord: [121.58, 38.90] }, { coord: [121.49, 38.93] }]
+        ]
       },
-      series: [
-        {
-          name: '区域拥堵',
-          type: 'scatter',
-          coordinateSystem: hasMap ? 'geo' : undefined,
-          data: scatter,
-          symbolSize: val => Math.max(10, (val?.[2] ?? 10) / 4),
+      // Node markers with ripple
+      {
+        name: '巡检节点',
+        type: 'effectScatter',
+        coordinateSystem: 'geo',
+        zlevel: 3,
+        rippleEffect: { brushType: 'stroke', scale: 3, period: 3 },
+        data: nodes.map(n => ({
+          name: n.name,
+          value: [...n.coord],
+          symbolSize: n.size,
           itemStyle: {
             color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.8, [
-              { offset: 0, color: 'rgba(0,228,255,0.9)' },
-              { offset: 1, color: 'rgba(0,228,255,0.1)' }
+              { offset: 0, color: n.color },
+              { offset: 1, color: n.color.replace(')', ',0.2)').replace('rgb', 'rgba') }
             ])
-          },
-          label: {
-            show: true, position: 'right',
-            formatter: '{b}', color: '#8CA0C4', fontSize: 11
           }
-        },
-        {
-          name: '巡检路线',
-          type: 'lines',
-          coordinateSystem: hasMap ? 'geo' : undefined,
-          zlevel: 2,
-          effect: {
-            show: true, period: 4, trailLength: 0.4,
-            symbol: 'arrow', symbolSize: 5, color: '#00E4FF'
-          },
-          lineStyle: {
-            color: '#2C92FF', width: 1, opacity: 0.4, curveness: 0.3
-          },
-          data: lines
-        },
-        {
-          name: '热力涟漪',
-          type: 'effectScatter',
-          coordinateSystem: hasMap ? 'geo' : undefined,
-          data: scatter.slice(0, 3),
-          symbolSize: val => Math.max(8, (val?.[2] ?? 10) / 5),
-          rippleEffect: { brushType: 'stroke', scale: 3, period: 3 },
-          itemStyle: { color: '#FF9F18' }
+        })),
+        label: {
+          show: true, position: 'right',
+          formatter: '{b}', color: '#C8D8F0', fontSize: 11,
+          textBorderColor: 'rgba(4, 11, 44, 0.8)', textBorderWidth: 2
         }
-      ]
-    };
-
-    if (!hasMap) {
-      // Fallback: simple coordinate scatter without map
-      base.series[0].coordinateSystem = undefined;
-      base.series[1].coordinateSystem = undefined;
-      base.series[2].coordinateSystem = undefined;
-    }
-    return base;
-  }
+      },
+      // Command center glow
+      {
+        name: '指挥中心',
+        type: 'scatter',
+        coordinateSystem: 'geo',
+        zlevel: 4,
+        symbol: 'pin',
+        symbolSize: 40,
+        itemStyle: { color: '#00E4FF' },
+        label: { show: false },
+        data: [{ name: '指挥中心', value: [121.58, 38.90] }]
+      }
+    ]
+  });
 
   window.addEventListener('resize', () => chart.resize());
 }
